@@ -13,21 +13,30 @@ func main() {
 		fmt.Printf("%s", err)
 		os.Exit(1)
 	}
-
-	err = cfg.SetUser("John")
-	if err != nil {
-		fmt.Printf("%s", err)
-		os.Exit(2)
+	currState := &state {
+		config: &cfg,
 	}
-
-	cfg, err = config.Read()
-	if err != nil {
-		fmt.Printf("%s\n", err)
+	commandList := &commands {
+		cmds: make(map[string]func(*state, command) error),
+	}
+	commandList.register("login", handlerLogin) 
+	
+	if len(os.Args) <= 1 {
+		fmt.Println("enter an argument")
 		os.Exit(1)
 	}
-
-	fmt.Printf("%+v", cfg)
-	os.Exit(0)
+	commandName := os.Args[1]
+	commandArguments := os.Args[2:]
+	
+	currCommand := command {
+		name: commandName,
+		args: commandArguments,
+	}
+	err = commandList.run(currState, currCommand)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
 
 
